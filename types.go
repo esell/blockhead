@@ -2,6 +2,9 @@ package main
 
 import (
 	"crypto/sha256"
+	"encoding/json"
+	"fmt"
+	"log"
 	"time"
 )
 
@@ -20,6 +23,8 @@ func (b *Blockchain) NewBlock(index, proof int64, isGenesis bool) Block {
 	block.Timestamp = time.Now().UnixNano()
 	block.Transactions = b.CurrentTransactions
 
+	// empty out transactions
+	b.CurrentTransactions = b.CurrentTransactions[:0]
 	return block
 }
 
@@ -34,8 +39,29 @@ func (b *Blockchain) NewTransaction(from, to string, amount int64) int64 {
 	return b.LastBlock().Index
 }
 
+func (b *Blockchain) ProofOfWork(lastProof int64) int64 {
+	log.Println("checking proof of work...")
+	proof := int64(0)
+	for !b.ValidProof(lastProof, proof) {
+		proof += 1
+	}
+	return proof
+
+}
+
+func (b *Blockchain) ValidProof(lastProof, newProof int64) bool {
+	concatString := string(lastProof) + string(newProof)
+	hash := sha256.New()
+	hash.Write([]byte(concatString))
+	proofTestReadable := fmt.Sprintf("%x", hash.Sum(nil))
+	if string(proofTestReadable[:4]) == "0000" {
+		return true
+	}
+	return false
+}
+
 func (b *Blockchain) LastBlock() Block {
-	return b.Blocks[len(b.Blocks)]
+	return b.Blocks[len(b.Blocks)-1]
 }
 
 type Block struct {
@@ -53,6 +79,11 @@ type Transaction struct {
 }
 
 func HashBlock(block Block) string {
-	hash := sha256.Sum256([]byte("hello world\n"))
-	return string(hash[:32])
+	blockJSON, err := json.Marshal(block)
+	if err != nil {
+		log.Println("error with JSON: ", err)
+	}
+	hash := sha256.New()
+	hash.Write([]byte(blockJSON))
+	return fmt.Sprintf("%x", hash.Sum(nil))
 }
