@@ -1,0 +1,13 @@
+pipeline:
+  build:
+    image: golang:1.7.5-wheezy
+    commands:
+      - apt-get -y install curl
+      - echo $HOME
+      - echo $PWD
+      - go version
+      - go test -cover -coverprofile coverage.out
+      - GOOS=linux GOARCH=amd64 go build -o blockhead_linux
+      - GOOS=darwin GOARCH=amd64 go build -o blockhead_darwin
+      - GOOS=windows GOARCH=amd64 go build -o blockhead_windows.exe
+      - curl -XPOST 'http://esheavyindustries.com:8080/upload?repo=blockhead_git' -F "file=@coverage.out"
