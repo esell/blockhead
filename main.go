@@ -11,7 +11,10 @@ func main() {
 	log.Println(myChain)
 
 	log.Println("creating genesis block...")
-	genBlock := myChain.NewBlock(1, 100, true)
+	genBlock, err := myChain.NewBlock(1, 100, true)
+	if err != nil {
+		log.Println(err)
+	}
 	genBlockJSON, err := json.Marshal(genBlock)
 	if err != nil {
 		log.Println("error with JSON: ", err)
@@ -35,7 +38,11 @@ func main() {
 		log.Println("new proof: ", newProof)
 
 		// add new block
-		myNewBlock := myChain.NewBlock(myChain.LastBlock().Index+1, newProof, false)
+		myNewBlock, err := myChain.NewBlock(myChain.LastBlock().Index+1, newProof, false)
+		if err != nil {
+			log.Println(err)
+			break
+		}
 		myChain.AddBlock(myNewBlock)
 	}
 	// print new chain

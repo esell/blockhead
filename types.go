@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -13,19 +14,29 @@ type Blockchain struct {
 	Blocks              []Block
 }
 
-func (b *Blockchain) NewBlock(index, proof int64, isGenesis bool) Block {
+func (b *Blockchain) NewBlock(index, proof int64, isGenesis bool) (Block, error) {
 	block := Block{}
 	block.Index = index
 	if !isGenesis {
-		block.PreviousHash = HashBlock(b.Blocks[len(b.Blocks)-1])
+		if len(b.Blocks) == 0 {
+			return Block{}, errors.New("Zero blocks exist but you are trying to create a non-genesis block. Create genesis block and retry")
+		} else {
+			block.PreviousHash = HashBlock(b.Blocks[len(b.Blocks)-1])
+		}
 	}
 	block.Proof = proof
 	block.Timestamp = time.Now().UnixNano()
-	block.Transactions = b.CurrentTransactions
-
+	if len(b.CurrentTransactions) > 0 {
+		block.Transactions = b.CurrentTransactions
+	} else if isGenesis {
+		// do nothing
+	} else {
+		//TODO: return err
+		return Block{}, errors.New("Transaction table is empty, cannot add empty block")
+	}
 	// empty out transactions
 	b.CurrentTransactions = b.CurrentTransactions[:0]
-	return block
+	return block, nil
 }
 
 func (b *Blockchain) AddBlock(block Block) {
