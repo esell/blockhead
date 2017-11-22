@@ -1,17 +1,19 @@
+workspace:
+  base: /go
+  path: src/git.esheavyindustries.com/esell/blockhead
+
 pipeline:
-  build:
-    image: golang:1.7.5-wheezy
+  test:
+    image: golang:1.9.2
     commands:
       - apt-get -y install curl
-      - echo $HOME
-      - echo $PWD
-      - go version
-      - export GOPATH=$PWD:$PWD/vendor
-      # not sure wtf drones problem is, but it wants vendor
-      # files in $PWD/vendor/src...
-      - mkdir -p $PWD/vendor/src && cp -r $PWD/vendor/github.com $PWD/vendor/src/
       - go test -cover -coverprofile coverage.out
+      - curl -XPOST 'http://esheavyindustries.com:8080/upload?repo=blockhead_git' -F "file=@coverage.out"
+
+  build:
+    image: golang:1.9.2
+    commands:
+      - apt-get -y install curl
       - GOOS=linux GOARCH=amd64 go build -o blockhead_linux
       - GOOS=darwin GOARCH=amd64 go build -o blockhead_darwin
       - GOOS=windows GOARCH=amd64 go build -o blockhead_windows.exe
-      - curl -XPOST 'http://esheavyindustries.com:8080/upload?repo=blockhead_git' -F "file=@coverage.out"
