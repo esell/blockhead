@@ -1,8 +1,19 @@
 package main
 
 import (
+	"strings"
 	"testing"
 )
+
+func TestHashBlock(t *testing.T) {
+	staticHash := strings.ToLower("4C5DE129BB39267AADEE63781962D3ADA87D77DA2791E1AA1EA4F535D19BEF2A")
+	testBlockHeader := BlockHeader{Index: 1, Proof: 100, Timestamp: 1511295968402564000}
+	testBlock := Block{Header: testBlockHeader}
+	testBlockHash := HashBlock(testBlock)
+	if testBlockHash != staticHash {
+		t.Errorf("Block hash is %v, should be %v", testBlockHash, staticHash)
+	}
+}
 
 func TestGenesisNewBlock(t *testing.T) {
 	testChain := Blockchain{}
@@ -10,14 +21,11 @@ func TestGenesisNewBlock(t *testing.T) {
 	if err != nil {
 		t.Errorf("%v", err)
 	}
-	if testBlock.Index != 1 {
-		t.Errorf("Block index is %v, should be %v\n", testBlock.Index, 1)
+	if testBlock.Header.Index != 1 {
+		t.Errorf("Block index is %v, should be %v\n", testBlock.Header.Index, 1)
 	}
-	if testBlock.Proof != 100 {
-		t.Errorf("Block proof is %v, should be %v\n", testBlock.Proof, 100)
-	}
-	if len(testBlock.Transactions) > 0 {
-		t.Errorf("Block transaction count is %v, should be %v\n", len(testBlock.Transactions), 0)
+	if testBlock.Header.Proof != 100 {
+		t.Errorf("Block proof is %v, should be %v\n", testBlock.Header.Proof, 100)
 	}
 }
 
@@ -37,15 +45,13 @@ func TestNewBlock(t *testing.T) {
 	if err != nil {
 		t.Errorf("%v", err)
 	}
-	if testBlock.Index != 1 {
-		t.Errorf("Genesis Block index is %v, should be %v\n", testBlock.Index, 1)
+	if testBlock.Header.Index != 1 {
+		t.Errorf("Genesis Block index is %v, should be %v\n", testBlock.Header.Index, 1)
 	}
-	if testBlock.Proof != 100 {
-		t.Errorf("Genesis Block proof is %v, should be %v\n", testBlock.Proof, 100)
+	if testBlock.Header.Proof != 100 {
+		t.Errorf("Genesis Block proof is %v, should be %v\n", testBlock.Header.Proof, 100)
 	}
-	if len(testBlock.Transactions) > 0 {
-		t.Errorf("Genesis Block transaction count is %v, should be %v\n", len(testBlock.Transactions), 0)
-	}
+
 	// need to add this block in order to continue tests
 	// assumes AddBlock() works :)
 	testChain.AddBlock(testBlock)
@@ -62,16 +68,16 @@ func TestNewBlock(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error creating new block: ", err)
 	}
-	if testBlock2.Index != 2 {
-		t.Errorf("Block index is %v, should be %v\n", testBlock2.Index, 2)
+	if testBlock2.Header.Index != 2 {
+		t.Errorf("Block index is %v, should be %v\n", testBlock2.Header.Index, 2)
 	}
-	if testBlock2.Proof != 200 {
-		t.Errorf("Block proof is %v, should be %v\n", testBlock2.Proof, 200)
+	if testBlock2.Header.Proof != 200 {
+		t.Errorf("Block proof is %v, should be %v\n", testBlock2.Header.Proof, 200)
 	}
+	// merkle of raw block transactions
+	//tree, _ := merkletree.NewTree(testChain.CurrentTransactions)
+	//_ = tree.MerkleRoot()
 
-	if len(testBlock2.Transactions) != 1 {
-		t.Errorf("Block transaction count is %v, should be %v\n", len(testBlock2.Transactions), 1)
-	}
 }
 
 func TestNewTransaction(t *testing.T) {
@@ -81,14 +87,11 @@ func TestNewTransaction(t *testing.T) {
 	if err != nil {
 		t.Errorf("%v", err)
 	}
-	if testBlock.Index != 1 {
-		t.Errorf("Genesis Block index is %v, should be %v\n", testBlock.Index, 1)
+	if testBlock.Header.Index != 1 {
+		t.Errorf("Genesis Block index is %v, should be %v\n", testBlock.Header.Index, 1)
 	}
-	if testBlock.Proof != 100 {
-		t.Errorf("Genesis Block proof is %v, should be %v\n", testBlock.Proof, 100)
-	}
-	if len(testBlock.Transactions) > 0 {
-		t.Errorf("Genesis Block transaction count is %v, should be %v\n", len(testBlock.Transactions), 0)
+	if testBlock.Header.Proof != 100 {
+		t.Errorf("Genesis Block proof is %v, should be %v\n", testBlock.Header.Proof, 100)
 	}
 	// need to add this block in order to continue tests
 	// assumes AddBlock() works :)

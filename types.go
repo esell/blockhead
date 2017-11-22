@@ -7,33 +7,41 @@ import (
 	"fmt"
 	"log"
 	"time"
+
+	"github.com/cbergoon/merkletree"
 )
 
 type Blockchain struct {
-	CurrentTransactions []Transaction
+	CurrentTransactions []merkletree.Content
 	Blocks              []Block
 }
 
 func (b *Blockchain) NewBlock(index, proof int64, isGenesis bool) (Block, error) {
+	blockHeader := BlockHeader{}
 	block := Block{}
-	block.Index = index
+	blockHeader.Index = index
 	if !isGenesis {
 		if len(b.Blocks) == 0 {
 			return Block{}, errors.New("Zero blocks exist but you are trying to create a non-genesis block. Create genesis block and retry")
 		} else {
-			block.PreviousHash = HashBlock(b.Blocks[len(b.Blocks)-1])
+			//		block.PreviousHash = block.CalculateHash()
+			blockHeader.PreviousHash = HashBlock(b.Blocks[len(b.Blocks)-1])
 		}
 	}
-	block.Proof = proof
-	block.Timestamp = time.Now().UnixNano()
+	blockHeader.Proof = proof
+	blockHeader.Timestamp = time.Now().UnixNano()
 	if len(b.CurrentTransactions) > 0 {
-		block.Transactions = b.CurrentTransactions
+		//block.Transactions = b.CurrentTransactions
+		t, _ := merkletree.NewTree(b.CurrentTransactions)
+		blockHeader.TransMerkleRoot = t.MerkleRoot()
 	} else if isGenesis {
 		// do nothing
 	} else {
 		//TODO: return err
 		return Block{}, errors.New("Transaction table is empty, cannot add empty block")
 	}
+	block.Header = blockHeader
+	block.Transactions = b.CurrentTransactions
 	// empty out transactions
 	b.CurrentTransactions = b.CurrentTransactions[:0]
 	return block, nil
@@ -47,7 +55,7 @@ func (b *Blockchain) NewTransaction(from, to string, amount int64) int64 {
 	transaction := Transaction{Recipient: to, Sender: from, Amount: amount}
 	b.CurrentTransactions = append(b.CurrentTransactions, transaction)
 
-	return b.LastBlock().Index
+	return b.LastBlock().Header.Index
 }
 
 func (b *Blockchain) ProofOfWork(lastProof int64) int64 {
@@ -75,18 +83,18 @@ func (b *Blockchain) LastBlock() Block {
 	return b.Blocks[len(b.Blocks)-1]
 }
 
-type Block struct {
-	Index        int64         `json:"index"`
-	PreviousHash string        `json:"previous_hash"`
-	Proof        int64         `json:"proof"`
-	Timestamp    int64         `json:"timestamp"`
-	Transactions []Transaction `json:"transactions"`
+type BlockHeader struct {
+	Index        int64  `json:"index"`
+	PreviousHash string `json:"previous_hash"`
+	Proof        int64  `json:"proof"`
+	Timestamp    int64  `json:"timestamp"`
+	//Transactions []Transaction `json:"transactions"`
+	TransMerkleRoot []byte
 }
 
-type Transaction struct {
-	Amount    int64  `json:"amount"`
-	Recipient string `json:"recipient"`
-	Sender    string `json:"sender"`
+type Block struct {
+	Header       BlockHeader
+	Transactions []merkletree.Content `json:"transactions"`
 }
 
 func HashBlock(block Block) string {
@@ -97,4 +105,24 @@ func HashBlock(block Block) string {
 	hash := sha256.New()
 	hash.Write([]byte(blockJSON))
 	return fmt.Sprintf("%x", hash.Sum(nil))
+}
+
+type Transaction struct {
+	Amount    int64  `json:"amount"`
+	Recipient string `json:"recipient"`
+	Sender    string `json:"sender"`
+}
+
+func (t Transaction) CalculateHash() []byte {
+	transJSON, err := json.Marshal(t)
+	if err != nil {
+		log.Println("error with JSON: ", err)
+	}
+	hash := sha256.New()
+	hash.Write([]byte(transJSON))
+	return hash.Sum(nil)
+}
+
+func (t Transaction) Equals(other merkletree.Content) bool {
+	return t.Amount == other.(Transaction).Amount
 }
