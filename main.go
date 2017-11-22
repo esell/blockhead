@@ -34,11 +34,11 @@ func main() {
 		// start mining
 		log.Println("starting to mine...")
 		lastProof := myChain.LastBlock()
-		newProof := myChain.ProofOfWork(lastProof.Proof)
+		newProof := myChain.ProofOfWork(lastProof.Header.Proof)
 		log.Println("new proof: ", newProof)
 
 		// add new block
-		myNewBlock, err := myChain.NewBlock(myChain.LastBlock().Index+1, newProof, false)
+		myNewBlock, err := myChain.NewBlock(myChain.LastBlock().Header.Index+1, newProof, false)
 		if err != nil {
 			log.Println(err)
 			break
