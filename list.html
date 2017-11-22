@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <title>Block List</title>
+    </head>
+    <body>
+        <table>
+            <thead>
+                <tr>
+                    <th>Index</th>
+                    <th>Proof</th>
+                    <th>Previous Hash</th>
+                    <th>Timestamp</th>
+                    <th>Transactions Merkle Root</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range $index, $element := . }}
+                <tr>
+                    <td>{{ $element.Header.Index }}</td>
+                    <td>{{ $element.Header.Proof }}</td>
+                    <td>{{ $element.Header.PreviousHash }}</td>
+                    <td>{{ $element.Header.Timestamp }}</td>
+                    <td>{{ $element.Header.TransMerkleRoot | printf "%q" }}</td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </body>
+</html>

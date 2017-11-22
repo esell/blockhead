@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -19,28 +20,32 @@ func main() {
 	myChain.AddBlock(genBlock)
 	log.Println("genesis block created, have fun!")
 
-	http.Handle("/list", blockListHandler(myChain))
-	http.Handle("/mine", mineHandler(myChain))
-	http.Handle("/newTransaction", newTransactionHandler(myChain))
+	http.Handle("/list", blockListHandler(&myChain))
+	http.Handle("/mine", mineHandler(&myChain))
+	http.Handle("/newTransaction", newTransactionHandler(&myChain))
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }
 
-func blockListHandler(b Blockchain) http.Handler {
+func blockListHandler(b *Blockchain) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.Error(w, "method not supported", http.StatusMethodNotAllowed)
 			return
 		}
+
 		chainJSON, err := json.Marshal(b)
 		if err != nil {
 			log.Println("error with JSON: ", err)
 		}
 		log.Println("full chain: ", string(chainJSON))
-		w.Write(chainJSON)
+		//	w.Write(chainJSON)
+
+		t, _ := template.ParseFiles("list.html")
+		t.Execute(w, b.Blocks)
 	})
 }
 
-func mineHandler(b Blockchain) http.Handler {
+func mineHandler(b *Blockchain) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.Error(w, "method not supported", http.StatusMethodNotAllowed)
@@ -67,7 +72,7 @@ func mineHandler(b Blockchain) http.Handler {
 	})
 }
 
-func newTransactionHandler(b Blockchain) http.Handler {
+func newTransactionHandler(b *Blockchain) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			http.Error(w, "method not supported", http.StatusMethodNotAllowed)
