@@ -9,7 +9,7 @@ pipeline:
       - export GOPATH=$PWD:$PWD/vendor
       # not sure wtf drones problem is, but it wants vendor
       # files in $PWD/vendor/src...
-      - mkdir -p $PWD/vendor/src && cp -r $PWD/vendor/github.com $PWD/vendor/src/ && cp -r $PWD/vendor/golang.org $PWD/vendor/src/
+      - mkdir -p $PWD/vendor/src && cp -r $PWD/vendor/github.com $PWD/vendor/src/
       - go test -cover -coverprofile coverage.out
       - GOOS=linux GOARCH=amd64 go build -o blockhead_linux
       - GOOS=darwin GOARCH=amd64 go build -o blockhead_darwin
