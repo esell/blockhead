@@ -23,10 +23,8 @@ func (b *Blockchain) NewBlock(index, proof int64, isGenesis bool) (Block, error)
 	if !isGenesis {
 		if len(b.Blocks) == 0 {
 			return Block{}, errors.New("Zero blocks exist but you are trying to create a non-genesis block. Create genesis block and retry")
-		} else {
-			//		block.PreviousHash = block.CalculateHash()
-			blockHeader.PreviousHash = HashBlock(b.Blocks[len(b.Blocks)-1])
 		}
+		blockHeader.PreviousHash = HashBlock(b.Blocks[len(b.Blocks)-1])
 	}
 	blockHeader.Proof = proof
 	blockHeader.Timestamp = time.Now().UnixNano()
@@ -62,7 +60,7 @@ func (b *Blockchain) ProofOfWork(lastProof int64) int64 {
 	log.Println("checking proof of work...")
 	proof := int64(0)
 	for !b.ValidProof(lastProof, proof) {
-		proof += 1
+		proof++
 	}
 	return proof
 

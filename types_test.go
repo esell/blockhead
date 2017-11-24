@@ -34,7 +34,7 @@ func TestNewBlockNoTrans(t *testing.T) {
 	// this should fail since there are no transactions
 	_, err := testChain.NewBlock(2, 200, false)
 	if err == nil {
-		t.Errorf("No error returned despite having zero transactions")
+		t.Error("No error returned despite having zero transactions")
 	}
 }
 
@@ -66,7 +66,7 @@ func TestNewBlock(t *testing.T) {
 	// hard code index and proof for simplicity
 	testBlock2, err := testChain.NewBlock(2, 200, false)
 	if err != nil {
-		t.Errorf("Error creating new block: ", err)
+		t.Errorf("Error creating new block: %v", err)
 	}
 	if testBlock2.Header.Index != 2 {
 		t.Errorf("Block index is %v, should be %v\n", testBlock2.Header.Index, 2)
