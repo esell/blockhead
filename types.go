@@ -84,11 +84,10 @@ func (b *Blockchain) LastBlock() Block {
 }
 
 type BlockHeader struct {
-	Index        int64  `json:"index"`
-	PreviousHash string `json:"previous_hash"`
-	Proof        int64  `json:"proof"`
-	Timestamp    int64  `json:"timestamp"`
-	//Transactions []Transaction `json:"transactions"`
+	Index           int64  `json:"index"`
+	PreviousHash    string `json:"previous_hash"`
+	Proof           int64  `json:"proof"`
+	Timestamp       int64  `json:"timestamp"`
 	TransMerkleRoot []byte
 }
 
