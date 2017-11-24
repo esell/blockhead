@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -19,7 +18,7 @@ func main() {
 	}
 	myChain.AddBlock(genBlock)
 	log.Println("genesis block created, have fun!")
-
+	http.Handle("/", http.FileServer(http.Dir(".")))
 	http.Handle("/list", blockListHandler(&myChain))
 	http.Handle("/mine", mineHandler(&myChain))
 	http.Handle("/newTransaction", newTransactionHandler(&myChain))
@@ -38,10 +37,7 @@ func blockListHandler(b *Blockchain) http.Handler {
 			log.Println("error with JSON: ", err)
 		}
 		log.Println("full chain: ", string(chainJSON))
-		//	w.Write(chainJSON)
-
-		t, _ := template.ParseFiles("list.html")
-		t.Execute(w, b.Blocks)
+		w.Write(chainJSON)
 	})
 }
 

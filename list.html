@@ -1,46 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Block List</title>
-
-        <link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-default.min.css">
-        <link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-nord.min.css">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Block List</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-default.min.css">
+	<link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-nord.min.css">
     </head>
     <body>
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-1">
-                    <h1>Blockhead</h1>
-                </div>      
-            </div>
-            <div class="row">
-                <div class="cols-sm-10">
-                    <table class="striped">
-                        <thead>
-                            <tr>
-                                <th>Index</th>
-                                <th>Proof</th>
-                                <th>Previous Hash</th>
-                                <th>Timestamp</th>
-                                <th>Transactions Merkle Root</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {{ range $index, $element := . }}
-                            <tr>
-                                <td>{{ $element.Header.Index }}</td>
-                                <td>{{ $element.Header.Proof }}</td>
-                                <td>{{ $element.Header.PreviousHash }}</td>
-                                <td>{{ $element.Header.Timestamp }}</td>
-                                <td>{{ $element.Header.TransMerkleRoot }}</td>
-                            </tr>
-                            {{ end }}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+	<div class="container">
+	    <div class="row">
+		<div class="col-sm-1">
+		    <h1>Blockhead</h1>
+		</div>      
+	    </div>
+	    <div class="row">
+		<div class="cols-sm-10">
+		    <table class="striped" id="blocklist">
+			<thead>
+			    <tr>
+				<th>Index</th>
+				<th>Proof</th>
+				<th>Previous Hash</th>
+				<th>Timestamp</th>
+				<th>Transactions Merkle Root</th>
+			    </tr>
+			</thead>
+			<tbody>
+			</tbody>
+		    </table>
+		</div>
+	    </div>
+	    <div class="row">
+		<div class="col-sm-1">
+		    <h1>Footer</h1>
+		</div>
+	    </div>
+	</div>
     </body>
+
+    <script type="text/javascript">
+	$(document).ready(function()
+	    {
+		$.ajax({
+		    url: "http://localhost:8000/list", 
+		    type: "GET",    
+		    dataType:"json",   
+		    success: function (response) 
+		    {
+			var trHTML = '';
+			$.each(response.Blocks, function (key,value) {
+			    trHTML += 
+				'<tr><td>' + value.Header.index + 
+				'</td><td>' + value.Header.proof +
+				'</td><td>' + value.Header.previous_hash +
+				'</td><td>' + value.Header.timestamp +
+				'</td><td>' + value.Header.TransMerkleRoot +
+				'</td></tr>';     
+			});
+
+			$('#blocklist').append(trHTML);
+		    }   
+		});
+	    });
+
+    </script>
 </html>
