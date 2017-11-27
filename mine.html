@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>New Transaction</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-default.min.css">
+
+        <link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-nord.min.css">
+    </head>
+    <body>
+        <header>
+            <a href="#" class="logo">Blockhead</a>
+            <button>About</button>
+            <span>|</span>
+            <a href="newTransaction.html" role="button">New Transaction</a>
+            <span>-></span>
+            <a href="mine.html" role="button" class="primary">Mine Blocks</a>
+            <span>-></span>
+            <a href="list.html" role="button">List Blocks</a>
+        </header>
+        <div class="container" style="padding-top: 8em;">
+            <div class="row">
+                <div class="col-sm-4 col-sm-offset-4">
+                    <center>
+                    <input type="button" class="primary" onclick="mineTransaction()" value="Mine!">
+                    </center>
+                </div>
+            </div>
+            <div class="row">
+                <p id="message"></p>
+            </div>
+        </div>
+    </body>
+
+    <script type="text/javascript">
+        function mineTransaction() {
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8000/mine",
+                success: function(data) {
+                    $("#message").html("Success!");
+                },
+                error: function(err) {
+                    alert(err);
+                }
+            });
+
+        }
+    </script>
+</html>

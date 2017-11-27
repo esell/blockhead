@@ -14,13 +14,13 @@
             <a href="#" class="logo">Blockhead</a>
             <button>About</button>
             <span>|</span>
-            <a href="newTransaction.html" role="button">New Transaction</a>
+            <a href="newTransaction.html" role="button" class="primary">New Transaction</a>
             <span>-></span>
-            <a href="#" role="button">Mine Blocks</a>
+            <a href="mine.html" role="button">Mine Blocks</a>
             <span>-></span>
             <a href="list.html" role="button">List Blocks</a>
         </header>
-        <div class="container">
+        <div class="container" style="padding-top: 8em;">
             <div class="row" id="forms-input">
                 <div class="col-sm-10 col-md-6">
                     <div class="section row">
@@ -66,12 +66,6 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-1">
-                <h1>Footer</h1>
-            </div>
-        </div>
-        </div>
     </body>
 
     <script type="text/javascript">
@@ -85,7 +79,7 @@
                 url: "http://localhost:8000/newTransaction",
                 data: {to:to,from:from,amount:amount},
                 success: function(data) {
-                    $("#message").html(data);
+                    $("#message").html("Success!");
                 },
                 error: function(err) {
                     alert(err);
