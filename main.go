@@ -22,6 +22,7 @@ func main() {
 	http.Handle("/list", blockListHandler(&myChain))
 	http.Handle("/mine", mineHandler(&myChain))
 	http.Handle("/newTransaction", newTransactionHandler(&myChain))
+	http.Handle("/getBlockTransactions", getTransactionListHandler(&myChain))
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }
 
@@ -74,13 +75,6 @@ func newTransactionHandler(b *Blockchain) http.Handler {
 			http.Error(w, "method not supported", http.StatusMethodNotAllowed)
 			return
 		}
-		/*
-			log.Println(r.URL.Query())
-			to := r.URL.Query().Get("to")
-			from := r.URL.Query().Get("from")
-			amount := r.URL.Query().Get("amount")
-			log.Println("amount is: ", amount)
-		*/
 		err := r.ParseForm()
 		if err != nil {
 			log.Println("error parsing form: ", err)
@@ -99,5 +93,32 @@ func newTransactionHandler(b *Blockchain) http.Handler {
 		}
 		log.Println("new transaction: ", string(transJSON))
 		w.Write(transJSON)
+	})
+}
+
+func getTransactionListHandler(b *Blockchain) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			http.Error(w, "method not supported", http.StatusMethodNotAllowed)
+			return
+		}
+
+		blockIndex := r.URL.Query().Get("index")
+		blockIndexInt, err := strconv.ParseInt(blockIndex, 10, 32)
+		if err != nil {
+			log.Println("error converting string -> int: ", err)
+		}
+		var block Block
+		for k, v := range b.Blocks {
+			if v.Header.Index == blockIndexInt {
+				block = b.Blocks[k]
+			}
+		}
+		blockTransJSON, err := json.Marshal(block.Transactions)
+		if err != nil {
+			log.Println("error with JSON: ", err)
+		}
+		log.Println("transaction list: ", string(blockTransJSON))
+		w.Write(blockTransJSON)
 	})
 }

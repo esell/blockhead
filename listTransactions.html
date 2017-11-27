@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Transaction List</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-default.min.css">
+	<link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-nord.min.css">
+    </head>
+    <body>
+	<header>
+	    <a href="#" class="logo">Blockhead</a>
+	    <button>About</button>
+	    <span>|</span>
+	    <a href="newTransaction.html" role="button">New Transaction</a>
+	    <span>-></span>
+	    <a href="mine.html" role="button">Mine Blocks</a>
+	    <span>-></span>
+	    <a href="list.html" role="button">List Blocks</a>
+	</header>
+	<div class="container"style="padding-top: 4em;">
+	    <div class="row">
+		<div class="cols-sm-10">
+		    <table class="striped" id="blocklist">
+			<thead>
+			    <tr>
+				<th>From</th>
+				<th>To</th>
+				<th>Amount</th>
+			    </tr>
+			</thead>
+			<tbody>
+			</tbody>
+		    </table>
+		</div>
+	    </div>
+	</div>
+    </body>
+
+    <script type="text/javascript">
+	function getQuery() {
+	    var data = {};
+
+	    location.search.substr(1).split('&').forEach(function (q) {
+		var s = q.split('='),
+		    k = s[0],
+		    v = s[1] && decodeURIComponent(s[1]);
+
+		if (k) data[k] = [v];
+	    });
+	    return data['index'].toString();
+	}
+
+$(document).ready(function()
+    {
+	$.ajax({
+	    url: "http://localhost:8000/getBlockTransactions?index=" + getQuery(), 
+	    type: "GET",    
+	    dataType:"json",   
+	    success: function (response) 
+	    {
+		var trHTML = '';
+		$.each(response, function (key,value) {
+		    trHTML += 
+			'<tr><td>' + value.sender + 
+			'</td><td>' + value.recipient +
+			'</td><td>' + value.amount +
+			'</td></tr>';     
+		});
+
+		$('#blocklist').append(trHTML);
+	    }   
+	});
+    });
+
+    </script>
+</html>
