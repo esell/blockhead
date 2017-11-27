@@ -74,9 +74,20 @@ func newTransactionHandler(b *Blockchain) http.Handler {
 			http.Error(w, "method not supported", http.StatusMethodNotAllowed)
 			return
 		}
-		to := r.URL.Query().Get("to")
-		from := r.URL.Query().Get("from")
-		amount := r.URL.Query().Get("amount")
+		/*
+			log.Println(r.URL.Query())
+			to := r.URL.Query().Get("to")
+			from := r.URL.Query().Get("from")
+			amount := r.URL.Query().Get("amount")
+			log.Println("amount is: ", amount)
+		*/
+		err := r.ParseForm()
+		if err != nil {
+			log.Println("error parsing form: ", err)
+		}
+		to := r.PostFormValue("to")
+		from := r.PostFormValue("from")
+		amount := r.PostFormValue("amount")
 		amountInt, err := strconv.ParseInt(amount, 10, 32)
 		if err != nil {
 			log.Println("error converting string -> int: ", err)

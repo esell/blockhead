@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>New Transaction</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-default.min.css">
+
+	<!--	<link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-nord.min.css"> -->
+    </head>
+    <body>
+	<div class="container">
+	    <div class="row">
+		<div class="col-sm-1">
+		    <h1>Blockhead</h1>
+		</div>      
+	    </div>
+	    <div class="row" id="forms-input">
+		<div class="col-sm-10 col-md-6">
+		    <div class="section row">
+			<div class="col-sm-10 col-md-7 col-md-offset-8">
+			    <form>
+				<fieldset>
+				    <div class="row responsive-label">
+					<div class="col-sm-12 col-md-3">
+					    <label for="from">From</label>
+					</div>
+					<div class="col-sm-12 col-md" >
+					    <input type="text" value="" id="from" placeholder="from" >
+					</div>
+				    </div>
+					    <div class="row responsive-label">
+						<div class="col-sm-12 col-md-3">
+						    <label for="to">To</label>
+						</div>
+						<div class="col-sm-12 col-md">
+						    <input type="text" value="" id="to" placeholder="to" >
+						</div>
+					    </div>
+					    <div class="row responsive-label">
+						<div class="col-sm-12 col-md-3">
+						    <label for="amount">Amount</label>
+						</div>
+						<div class="col-sm-12 col-md">
+						    <input type="text" id="amount" value="" placeholder="666" >
+						</div>
+					    </div>
+					    <div class="row responsive-label">
+						<div class="col-sm-12 col-md">
+						    <input type="button" class="primary" onclick="submitTransaction()" value="Submit Transaction">
+						</div>
+					    </div>
+					    <div class="row">
+						<p id="message"></p>
+					    </div>
+				</fieldset>
+			    </form>
+			</div>
+		    </div>
+		</div>
+	    </div>
+	</div>
+	<div class="row">
+	    <div class="col-sm-1">
+		<h1>Footer</h1>
+	    </div>
+	</div>
+	</div>
+    </body>
+
+    <script type="text/javascript">
+	function submitTransaction() {
+	    var to=$("#from").val();
+	    var from=$("#to").val();
+	    var amount=$("#amount").val();
+    
+	    $.ajax({
+		type: "POST",
+		url: "http://localhost:8000/newTransaction",
+		data: {to:to,from:from,amount:amount},
+		success: function(data) {
+		    $("#message").html(data);
+		},
+		error: function(err) {
+		    alert(err);
+		}
+	    });
+
+	}
+    </script>
+</html>
