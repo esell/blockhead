@@ -6,7 +6,7 @@ import (
 )
 
 func TestHashBlock(t *testing.T) {
-	staticHash := strings.ToLower("4C5DE129BB39267AADEE63781962D3ADA87D77DA2791E1AA1EA4F535D19BEF2A")
+	staticHash := strings.ToLower("22E6E24D132B3E42A25F0571D7B3DD2232197EFE14085219D05420B439AA7B73")
 	testBlockHeader := BlockHeader{Index: 1, Proof: 100, Timestamp: 1511295968402564000}
 	testBlock := Block{Header: testBlockHeader}
 	testBlockHash := HashBlock(testBlock)

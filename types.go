@@ -47,6 +47,7 @@ func (b *Blockchain) NewBlock(index, proof int64, isGenesis bool) (Block, error)
 
 func (b *Blockchain) AddBlock(block Block) {
 	b.Blocks = append(b.Blocks, block)
+	b.UpdateBlockHashes()
 }
 
 func (b *Blockchain) NewTransaction(from, to string, amount int64) int64 {
@@ -77,12 +78,21 @@ func (b *Blockchain) ValidProof(lastProof, newProof int64) bool {
 	return false
 }
 
+func (b *Blockchain) UpdateBlockHashes() {
+	for k, v := range b.Blocks {
+		blockHash := HashBlock(v)
+		b.Blocks[k].Header.Hash = blockHash
+	}
+
+}
+
 func (b *Blockchain) LastBlock() Block {
 	return b.Blocks[len(b.Blocks)-1]
 }
 
 type BlockHeader struct {
 	Index           int64  `json:"index"`
+	Hash            string `json:"hash"`
 	PreviousHash    string `json:"previous_hash"`
 	Proof           int64  `json:"proof"`
 	Timestamp       int64  `json:"timestamp"`

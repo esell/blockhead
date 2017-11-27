@@ -11,7 +11,7 @@
     <body>
         <header>
             <a href="#" class="logo">Blockhead</a>
-            <button>About</button>
+            <a href="index.html" role="button">About</a>
             <span>|</span>
             <a href="newTransaction.html" role="button">New Transaction</a>
             <span>-></span>
@@ -21,13 +21,15 @@
         </header>
         <div class="container"style="padding-top: 4em;">
             <div class="row">
-                <div class="cols-sm-10">
-                    <table class="striped" id="blocklist">
+                
+                <div class="col-sm-12 col-sm-last col-md-12 col-md-normal">
+                    <table id="blocklist">
                         <thead>
                             <tr>
                                 <th>Index</th>
                                 <th>Proof</th>
-                                <th>Previous Hash</th>
+                                <th>Hash</th>
+                                <th>Previous Block Hash</th>
                                 <th>Timestamp</th>
                                 <th>Transactions Merkle Root</th>
                             </tr>
@@ -52,17 +54,19 @@
                         var trHTML = '';
                         $.each(response.Blocks, function (key,value) {
                             trHTML += 
-                                '<tr><td>' + value.Header.index + 
-                                '</td><td>' + value.Header.proof +
-                                '</td><td>' + value.Header.previous_hash +
-                                '</td><td>' + value.Header.timestamp +
-                                '</td><td><a href="http://localhost:8000/listTransactions.html?index=' + value.Header.index + '">' + value.Header.TransMerkleRoot + '</a>' +
+                                '<tr><td style="font-size:10px;">' + value.Header.index + 
+                                '</td><td style="font-size:10px;">' + value.Header.proof +
+                                '</td><td style="font-size:10px;">' + value.Header.hash +
+                                '</td><td style="font-size:10px;">' + value.Header.previous_hash +
+                                '</td><td style="font-size:10px;">' + value.Header.timestamp +
+                                '</td><td style="font-size:10px;"><a href="http://localhost:8000/listTransactions.html?index=' + value.Header.index + '">' + value.Header.TransMerkleRoot + '</a>' +
                                 '</td></tr>';     
                         });
 
                         $('#blocklist').append(trHTML);
                     }   
                 });
+
             });
 
     </script>
