@@ -22,6 +22,7 @@
         <div class="container"style="padding-top: 4em;">
             <div class="row">
                 <div class="col-sm-10 col-sm-offset-1">
+                    <h1>Purpose</h1>
                     <p>
                     Blockhead is meant to be an interactive way to learn about blockchain technology. It is not designed to be a full blown, real deal blockchain, but
                     instead to allow users to interact with a toy blockchain and understand the basic concepts.
@@ -29,6 +30,14 @@
                     Blockhead acts as a standalone node where all of the typically blockchain processes are ran. There will be a built-in web UI where users
                     can add transactions, trigger mining, edit transactions etc in order to see, step-by-step, how a blockchain works.
                     </p>
+                    <br>
+                    <h1>Quirks</h1>
+                    <p>
+                    The hash for the actual block is calculated <b>after</b> it has been added to the chain. What this means is that when calculating the hash
+                    for the block, the actual "hash" attribute is not included, so in theory the displayed hash is actually not correct :). This is a bit of a 
+                    chicken or egg type problem but given that this is a toy blockchain it is acceptable.
+                    </p>
+
                 </div>
             </div>
         </div>

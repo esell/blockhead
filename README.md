@@ -16,7 +16,7 @@ since evolved into (hopefully) a learning tool.
 # Typical process
 
 * Start the app :)
-* Open up a browser and navigate to `http://localhost:8000/newTransaction.html`. From there just follow the arrows in the top menu
+* Open up a browser and navigate to `http://localhost:8000/`. From there just follow the arrows in the top menu
 
 
 
