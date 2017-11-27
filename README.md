@@ -16,9 +16,7 @@ since evolved into (hopefully) a learning tool.
 # Typical process
 
 * Start the app :)
-* Create a transaction: `curl -XPOST 'localhost:8000/newTransaction?to=blahto&from=blahfrom&amount=999'`
-* Mine a new block: `curl 'localhost:8000/mine'`
-* Get a list of blocks: `curl 'localhost:8000/list'`
+* Open up a browser and navigate to `http://localhost:8000/newTransaction.html`. From there just follow the arrows in the top menu
 
 
 
