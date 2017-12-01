@@ -15,7 +15,9 @@ since evolved into (hopefully) a learning tool.
 
 # Typical process
 
-* Start the app :)
+* `go get git.esheavyindustries.com/esell/blockhead`
+* `cd $GOPATH/src/git.esheavyindustries.com/esell/blockhead`
+* `go run main.go types.go` (or you can build it `go build .`)
 * Open up a browser and navigate to `http://localhost:8000/`. From there just follow the arrows in the top menu
 
 
