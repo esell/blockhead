@@ -22,7 +22,8 @@ func main() {
 	http.Handle("/list", blockListHandler(&myChain))
 	http.Handle("/mine", mineHandler(&myChain))
 	http.Handle("/newTransaction", newTransactionHandler(&myChain))
-	http.Handle("/getBlockTransactions", getTransactionListHandler(&myChain))
+	http.Handle("/getBlockTransactions", getBlockTransactionListHandler(&myChain))
+	http.Handle("/listTransactions", transactionListHandler(&myChain))
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }
 
@@ -39,6 +40,22 @@ func blockListHandler(b *Blockchain) http.Handler {
 		}
 		log.Println("full chain: ", string(chainJSON))
 		w.Write(chainJSON)
+	})
+}
+
+func transactionListHandler(b *Blockchain) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			http.Error(w, "method not supported", http.StatusMethodNotAllowed)
+			return
+		}
+
+		transactionListJSON, err := json.Marshal(b.CurrentTransactions)
+		if err != nil {
+			log.Println("error with JSON: ", err)
+		}
+		log.Println("transaction list: ", string(transactionListJSON))
+		w.Write(transactionListJSON)
 	})
 }
 
@@ -96,7 +113,7 @@ func newTransactionHandler(b *Blockchain) http.Handler {
 	})
 }
 
-func getTransactionListHandler(b *Blockchain) http.Handler {
+func getBlockTransactionListHandler(b *Blockchain) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.Error(w, "method not supported", http.StatusMethodNotAllowed)

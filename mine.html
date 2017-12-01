@@ -1,52 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>New Transaction</title>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-default.min.css">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>New Transaction</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-default.min.css">
 
-        <link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-nord.min.css">
+	<link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-nord.min.css">
     </head>
     <body>
-        <header>
-            <a href="#" class="logo">Blockhead</a>
-            <a href="index.html" role="button">About</a>
-            <span>|</span>
-            <a href="newTransaction.html" role="button">New Transaction</a>
-            <span>-></span>
-            <a href="mine.html" role="button" class="primary">Mine Blocks</a>
-            <span>-></span>
-            <a href="list.html" role="button">List Blocks</a>
-        </header>
-        <div class="container" style="padding-top: 8em;">
-            <div class="row">
-                <div class="col-sm-4 col-sm-offset-4">
-                    <center>
-                    <input type="button" class="primary" onclick="mineTransaction()" value="Mine!">
-                    </center>
-                </div>
-            </div>
-            <div class="row">
-                <p id="message"></p>
-            </div>
-        </div>
+	<header>
+	    <a href="#" class="logo">Blockhead</a>
+	    <a href="index.html" role="button">About</a>
+	    <span>|</span>
+	    <a href="newTransaction.html" role="button">New Transaction</a>
+	    <span>-></span>
+	    <a href="mine.html" role="button" class="primary">Mine Blocks</a>
+	    <span>-></span>
+	    <a href="list.html" role="button">List Blocks</a>
+	</header>
+	<div class="container" style="padding-top: 8em;">
+	    <div class="row">
+		<div class="col-sm-12 col-sm-last col-md-12 col-md-normal">
+		    <center>
+			<h1>Un-mined Transactions</h1>
+		    </center>
+		    <table class="striped" id="translist">
+			<thead>
+			    <tr>
+				<th>From</th>
+				<th>To</th>
+				<th>Amount</th>
+			    </tr>
+			</thead>
+			<tbody>
+			</tbody>
+		    </table>
+		    <br><br>
+		</div>
+	    </div>
+	    <div class="row">
+		<div class="col-sm-4 col-sm-offset-4">
+		    <center>
+			<input type="button" class="primary" onclick="mineTransaction()" value="Mine!">
+		    </center>
+		</div>
+	    </div>
+	    <div class="row">
+		<div class="col-sm-4 col-sm-offset-4">
+		    <center>
+			<p id="message"></p>
+		    </center>
+		</div>
+	    </div>
+	</div>
     </body>
 
     <script type="text/javascript">
-        function mineTransaction() {
-            $.ajax({
-                type: "GET",
-                url: "http://localhost:8000/mine",
-                success: function(data) {
-                    $("#message").html("Success!");
-                },
-                error: function(err) {
-                    alert(err);
-                }
-            });
+	function loadTransactions() {
+	    $('#translist').empty();
+	    $.ajax({
+		url: "http://localhost:8000/listTransactions",
+		type: "GET",
+		dataType:"json",
+		success: function (response)
+		{
+		    var trHTML = '';
+		    $.each(response, function (key,value) {
+			trHTML +=
+			    '<tr><td>' + value.sender +
+			    '</td><td>' + value.recipient +
+			    '</td><td>' + value.amount +
+			    '</td></tr>';
+		    });
 
-        }
+		    $('#translist').append(trHTML);
+		}
+	    });
+	}
+
+function mineTransaction() {
+    $.ajax({
+	type: "GET",
+	url: "http://localhost:8000/mine",
+	success: function(data) {
+	    $("#message").html("Success!");
+	    loadTransactions();
+	},
+	error: function(err) {
+	    alert(err);
+	}
+    });
+
+}
+
+$(document).ready(function()
+    {
+	$.ajax({
+	    url: "http://localhost:8000/listTransactions",
+	    type: "GET",
+	    dataType:"json",
+	    success: function (response)
+	    {
+		var trHTML = '';
+		$.each(response, function (key,value) {
+		    trHTML +=
+			'<tr><td>' + value.sender +
+			'</td><td>' + value.recipient +
+			'</td><td>' + value.amount +
+			'</td></tr>';
+		});
+
+		$('#translist').append(trHTML);
+	    }
+	});
+    });
     </script>
 </html>
