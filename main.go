@@ -145,15 +145,7 @@ func editTransactionHandler(b *Blockchain) http.Handler {
 				}
 			}
 		}
-
-		/*
-			for k, v := range b.CurrentTransactions {
-				if v.(Transaction).ID == transID {
-					transaction := Transaction{Recipient: to, Sender: from, Amount: amountInt}
-					b.CurrentTransactions[k] = transaction
-				}
-			}
-		*/
+		b.UpdateBlockHashes()
 		w.Write([]byte("{\"status\":\"done\"}"))
 	})
 }

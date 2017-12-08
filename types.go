@@ -25,12 +25,11 @@ func (b *Blockchain) NewBlock(index, proof int64, isGenesis bool) (Block, error)
 		if len(b.Blocks) == 0 {
 			return Block{}, errors.New("Zero blocks exist but you are trying to create a non-genesis block. Create genesis block and retry")
 		}
-		blockHeader.PreviousHash = HashBlock(b.Blocks[len(b.Blocks)-1])
+		blockHeader.PreviousHash = b.LastBlock().Header.Hash
 	}
 	blockHeader.Proof = proof
 	blockHeader.Timestamp = time.Now().UnixNano()
 	if len(b.CurrentTransactions) > 0 {
-		//block.Transactions = b.CurrentTransactions
 		t, _ := merkletree.NewTree(b.CurrentTransactions)
 		blockHeader.TransMerkleRoot = t.MerkleRoot()
 	} else if isGenesis {
@@ -59,10 +58,8 @@ func (b *Blockchain) NewTransaction(from, to string, amount int64) int64 {
 	concatString := string(from) + string(to) + time.Now().String() + strconv.FormatInt(amount, 10)
 	hash := sha256.New()
 	hash.Write([]byte(concatString))
-	readableHash := fmt.Sprintf("%x", hash.Sum(nil))
 
-	transaction := Transaction{ID: string(readableHash), Recipient: to, Sender: from, Amount: amount}
-
+	transaction := Transaction{ID: string(fmt.Sprintf("%x", hash.Sum(nil))), Recipient: to, Sender: from, Amount: amount}
 	b.CurrentTransactions = append(b.CurrentTransactions, transaction)
 
 	return b.LastBlock().Header.Index
@@ -91,15 +88,14 @@ func (b *Blockchain) ValidProof(lastProof, newProof int64) bool {
 
 func (b *Blockchain) UpdateBlockHashes() {
 	for k, v := range b.Blocks {
-		blockHash := HashBlock(v)
-		b.Blocks[k].Header.Hash = blockHash
+		v.HashBlock()
+		b.Blocks[k] = v
 	}
-
 }
 
-func (b *Blockchain) LastBlock() Block {
+func (b *Blockchain) LastBlock() *Block {
 	log.Println("LastBlock(): ", len(b.Blocks)-1)
-	return b.Blocks[len(b.Blocks)-1]
+	return &b.Blocks[len(b.Blocks)-1]
 }
 
 type BlockHeader struct {
@@ -116,14 +112,16 @@ type Block struct {
 	Transactions []merkletree.Content `json:"transactions"`
 }
 
-func HashBlock(block Block) string {
+func (block *Block) HashBlock() {
+	// reset hash to get an accurate "reading"
+	block.Header.Hash = ""
 	blockJSON, err := json.Marshal(block)
 	if err != nil {
 		log.Println("error with JSON: ", err)
 	}
 	hash := sha256.New()
 	hash.Write([]byte(blockJSON))
-	return fmt.Sprintf("%x", hash.Sum(nil))
+	block.Header.Hash = string(fmt.Sprintf("%x", hash.Sum(nil)))
 }
 
 type Transaction struct {

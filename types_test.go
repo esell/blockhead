@@ -9,9 +9,9 @@ func TestHashBlock(t *testing.T) {
 	staticHash := strings.ToLower("22E6E24D132B3E42A25F0571D7B3DD2232197EFE14085219D05420B439AA7B73")
 	testBlockHeader := BlockHeader{Index: 1, Proof: 100, Timestamp: 1511295968402564000}
 	testBlock := Block{Header: testBlockHeader}
-	testBlockHash := HashBlock(testBlock)
-	if testBlockHash != staticHash {
-		t.Errorf("Block hash is %v, should be %v", testBlockHash, staticHash)
+	testBlock.HashBlock()
+	if testBlock.Header.Hash != staticHash {
+		t.Errorf("Block hash is %v, should be %v", testBlock.Header.Hash, staticHash)
 	}
 }
 

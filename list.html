@@ -53,11 +53,20 @@
                     {
                         var trHTML = '';
                         $.each(response.Blocks, function (key,value) {
+                            var color = "green";
+                            if (key != "0") {
+                                var oldKey = key - 1;
+                                console.log("old key: " + oldKey);
+                                console.log("prev hash: " + response.Blocks[oldKey].Header.hash);
+                                if (response.Blocks[oldKey].Header.hash != response.Blocks[key].Header.previous_hash) {
+                                    color = "red";
+                                }
+                            }
                             trHTML += 
                                 '<tr><td style="font-size:10px;">' + value.Header.index + 
                                 '</td><td style="font-size:10px;">' + value.Header.proof +
                                 '</td><td style="font-size:10px;">' + value.Header.hash +
-                                '</td><td style="font-size:10px;">' + value.Header.previous_hash +
+                                '</td><td style="font-size:10px;color:#ff000;"><span style="color:'+ color +';">' + value.Header.previous_hash + '</span>' +
                                 '</td><td style="font-size:10px;">' + value.Header.timestamp +
                                 '</td><td style="font-size:10px;"><a href="http://localhost:8000/listTransactions.html?index=' + value.Header.index + '">' + value.Header.TransMerkleRoot + '</a>' +
                                 '</td></tr>';     
