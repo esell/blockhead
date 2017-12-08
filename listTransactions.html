@@ -11,7 +11,7 @@
     <body>
 	<header>
 	    <a href="#" class="logo">Blockhead</a>
-            <a href="index.html" role="button">About</a>
+	    <a href="index.html" role="button">About</a>
 	    <span>|</span>
 	    <a href="newTransaction.html" role="button">New Transaction</a>
 	    <span>-></span>
@@ -28,9 +28,10 @@
 				<th>From</th>
 				<th>To</th>
 				<th>Amount</th>
+				<th></th>
 			    </tr>
 			</thead>
-			<tbody>
+			<tbody id="blockbody">
 			</tbody>
 		    </table>
 		</div>
@@ -52,26 +53,56 @@
 	    return data['index'].toString();
 	}
 
+function updateTransaction(transid) {
+    console.log("updating id: " + transid);
+    var to=$("#from-" + transid).val();
+    console.log(to);
+    var from=$("#to-" + transid).val();
+    console.log(from);
+    var amount=$("#amount-" + transid).val();
+    console.log(amount);
+    $.ajax({
+	type: "POST",
+	url: "http://localhost:8000/editTransaction",
+	data: {blockindex:getQuery(), id:transid, to:to,from:from,amount:amount},
+	success: function(data) {
+	    $("#message").html("Success!");
+$('#blockbody').empty();
+	    listTransactions();
+	},
+	error: function(err) {
+	    alert(err);
+	}
+    });
+
+}
+
+function listTransactions() {
+    $.ajax({
+	url: "http://localhost:8000/getBlockTransactions?index=" + getQuery(),
+	type: "GET",
+	dataType:"json",
+	success: function (response)
+	{
+	    var trHTML = '';
+	    $.each(response, function (key,value) {
+		trHTML +=
+		    '<tr><td><input type="text" id="from-'+ value.id + '" value="' + value.sender + '">' +
+		    '</td><td><input type="text" id="to-'+ value.id + '" value="' + value.recipient + '">' +
+		    '</td><td><input type="text" id="amount-'+ value.id + '" value="' + value.amount + '">' +
+		    '</td><td><input type="button" class="secondary" onclick="updateTransaction(\'' + value.id + '\')" value="Save">' +
+			'</td></tr>';
+		    });
+
+		$('#blockbody').append(trHTML);
+	    }
+    });
+}
+
+
 $(document).ready(function()
     {
-	$.ajax({
-	    url: "http://localhost:8000/getBlockTransactions?index=" + getQuery(), 
-	    type: "GET",    
-	    dataType:"json",   
-	    success: function (response) 
-	    {
-		var trHTML = '';
-		$.each(response, function (key,value) {
-		    trHTML += 
-			'<tr><td>' + value.sender + 
-			'</td><td>' + value.recipient +
-			'</td><td>' + value.amount +
-			'</td></tr>';     
-		});
-
-		$('#blocklist').append(trHTML);
-	    }   
-	});
+	listTransactions();
     });
 
     </script>

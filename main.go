@@ -22,6 +22,7 @@ func main() {
 	http.Handle("/list", blockListHandler(&myChain))
 	http.Handle("/mine", mineHandler(&myChain))
 	http.Handle("/newTransaction", newTransactionHandler(&myChain))
+	http.Handle("/editTransaction", editTransactionHandler(&myChain))
 	http.Handle("/getBlockTransactions", getBlockTransactionListHandler(&myChain))
 	http.Handle("/listTransactions", transactionListHandler(&myChain))
 	log.Fatal(http.ListenAndServe(":8000", nil))
@@ -110,6 +111,50 @@ func newTransactionHandler(b *Blockchain) http.Handler {
 		}
 		log.Println("new transaction: ", string(transJSON))
 		w.Write(transJSON)
+	})
+}
+
+func editTransactionHandler(b *Blockchain) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if r.Method != "POST" {
+			http.Error(w, "method not supported", http.StatusMethodNotAllowed)
+			return
+		}
+		err := r.ParseForm()
+		if err != nil {
+			log.Println("error parsing form: ", err)
+		}
+		blockIndex := r.PostFormValue("blockindex")
+		blockIndexInt, err := strconv.ParseInt(blockIndex, 10, 32)
+		transID := r.PostFormValue("id")
+		to := r.PostFormValue("to")
+		from := r.PostFormValue("from")
+		amount := r.PostFormValue("amount")
+		amountInt, err := strconv.ParseInt(amount, 10, 32)
+		if err != nil {
+			log.Println("error converting string -> int: ", err)
+		}
+		for _, v := range b.Blocks {
+			if v.Header.Index == blockIndexInt {
+				for x, y := range v.Transactions {
+					if y.(Transaction).ID == transID {
+						transaction := Transaction{ID: transID, Recipient: to, Sender: from, Amount: amountInt}
+						v.Transactions[x] = transaction
+					}
+				}
+			}
+		}
+
+		/*
+			for k, v := range b.CurrentTransactions {
+				if v.(Transaction).ID == transID {
+					transaction := Transaction{Recipient: to, Sender: from, Amount: amountInt}
+					b.CurrentTransactions[k] = transaction
+				}
+			}
+		*/
+		w.Write([]byte("{\"status\":\"done\"}"))
 	})
 }
 
