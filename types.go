@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/cbergoon/merkletree"
@@ -39,7 +40,11 @@ func (b *Blockchain) NewBlock(index, proof int64, isGenesis bool) (Block, error)
 		return Block{}, errors.New("Transaction table is empty, cannot add empty block")
 	}
 	block.Header = blockHeader
-	block.Transactions = b.CurrentTransactions
+	if len(b.CurrentTransactions) > 0 {
+		for _, v := range b.CurrentTransactions {
+			block.Transactions = append(block.Transactions, v)
+		}
+	}
 	// empty out transactions
 	b.CurrentTransactions = b.CurrentTransactions[:0]
 	return block, nil
@@ -51,7 +56,13 @@ func (b *Blockchain) AddBlock(block Block) {
 }
 
 func (b *Blockchain) NewTransaction(from, to string, amount int64) int64 {
-	transaction := Transaction{Recipient: to, Sender: from, Amount: amount}
+	concatString := string(from) + string(to) + time.Now().String() + strconv.FormatInt(amount, 10)
+	hash := sha256.New()
+	hash.Write([]byte(concatString))
+	readableHash := fmt.Sprintf("%x", hash.Sum(nil))
+
+	transaction := Transaction{ID: string(readableHash), Recipient: to, Sender: from, Amount: amount}
+
 	b.CurrentTransactions = append(b.CurrentTransactions, transaction)
 
 	return b.LastBlock().Header.Index
@@ -87,6 +98,7 @@ func (b *Blockchain) UpdateBlockHashes() {
 }
 
 func (b *Blockchain) LastBlock() Block {
+	log.Println("LastBlock(): ", len(b.Blocks)-1)
 	return b.Blocks[len(b.Blocks)-1]
 }
 
@@ -115,6 +127,7 @@ func HashBlock(block Block) string {
 }
 
 type Transaction struct {
+	ID        string `json:"id"`
 	Amount    int64  `json:"amount"`
 	Recipient string `json:"recipient"`
 	Sender    string `json:"sender"`

@@ -105,3 +105,84 @@ func TestNewTransaction(t *testing.T) {
 		t.Errorf("Transaction count on chain is %v, should be %v", len(testChain.CurrentTransactions), 1)
 	}
 }
+
+func TestOverwrite(t *testing.T) {
+	testChain := Blockchain{}
+	// create genesis block, needed for testing
+	testBlock, err := testChain.NewBlock(1, 100, true)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	if testBlock.Header.Index != 1 {
+		t.Errorf("Genesis Block index is %v, should be %v\n", testBlock.Header.Index, 1)
+	}
+	if testBlock.Header.Proof != 100 {
+		t.Errorf("Genesis Block proof is %v, should be %v\n", testBlock.Header.Proof, 100)
+	}
+	// need to add this block in order to continue tests
+	// assumes AddBlock() works :)
+	testChain.AddBlock(testBlock)
+
+	// Transaction #1
+	tempTrans := testChain.NewTransaction("blahfrom", "blahto", 666)
+	if tempTrans != 1 {
+		t.Errorf("Transaction index is %v, should be %v", tempTrans, 1)
+	}
+	if len(testChain.CurrentTransactions) != 1 {
+		t.Errorf("Transaction count on chain is %v, should be %v", len(testChain.CurrentTransactions), 1)
+	}
+
+	// mine the transaction
+	lastProof := testChain.LastBlock()
+	newProof := testChain.ProofOfWork(lastProof.Header.Proof)
+	// add Block #1
+	newBlock, err := testChain.NewBlock(testChain.LastBlock().Header.Index+1, newProof, false)
+	if err != nil {
+		t.Errorf("Error adding new block: %v", err)
+	}
+	testChain.AddBlock(newBlock)
+	blockOneTrans := testChain.Blocks[1].Transactions[0].(Transaction)
+	if blockOneTrans.Sender != "blahfrom" {
+		t.Errorf("Transaction sender is %v, should be %v", blockOneTrans.Sender, "blahfrom")
+	}
+	if len(testChain.CurrentTransactions) != 0 {
+		t.Errorf("Transaction count on chain is %v, should be %v", len(testChain.CurrentTransactions), 0)
+	}
+
+	// Transaction #2
+	tempTransTwo := testChain.NewTransaction("blahfromtwo", "blahtotwo", 999)
+	if tempTransTwo != 2 {
+		t.Errorf("Transaction index is %v, should be %v", tempTransTwo, 2)
+	}
+	if len(testChain.CurrentTransactions) != 1 {
+		t.Errorf("Transaction count on chain is %v, should be %v", len(testChain.CurrentTransactions), 1)
+	}
+	// mine the transaction
+
+	lastProofTwo := testChain.LastBlock()
+	newProofTwo := testChain.ProofOfWork(lastProofTwo.Header.Proof)
+	// add Block #2
+	newBlockTwo, err := testChain.NewBlock(testChain.LastBlock().Header.Index+1, newProofTwo, false)
+	if err != nil {
+		t.Errorf("Error adding new block: %v", err)
+	}
+	testChain.AddBlock(newBlockTwo)
+	blockTwoTrans := testChain.Blocks[2].Transactions[0].(Transaction)
+	if blockTwoTrans.Sender != "blahfromtwo" {
+		t.Errorf("Transaction sender is %v, should be %v", blockTwoTrans.Sender, "blahfromtwo")
+	}
+	if len(testChain.CurrentTransactions) != 0 {
+		t.Errorf("Transaction count on chain is %v, should be %v", len(testChain.CurrentTransactions), 0)
+	}
+
+	// did block #1 stay the same?
+	blockOneTransNew := testChain.Blocks[1].Transactions[0].(Transaction)
+	if blockOneTransNew.Sender != "blahfrom" {
+		t.Errorf("Transaction sender is %v, should be %v", blockOneTransNew.Sender, "blahfrom")
+	}
+
+	if len(testChain.CurrentTransactions) != 0 {
+		t.Errorf("Transaction count on chain is %v, should be %v", len(testChain.CurrentTransactions), 0)
+	}
+
+}
