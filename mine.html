@@ -20,12 +20,34 @@
 	    <span>-></span>
 	    <a href="list.html" role="button">List Blocks</a>
 	</header>
-	<div class="container" style="padding-top: 8em;">
+	<div class="container" style="padding-top: 4em;">
 	    <div class="row">
 		<div class="col-sm-12 col-sm-last col-md-12 col-md-normal">
 		    <center>
 			<h1>Un-mined Transactions</h1>
 		    </center>
+                </div>
+                              <div class="row">
+                  <div class="col-sm-10 col-sm-last col-sm-offset-1 col-md-10 col-md-normal">
+                  <p>
+                  Typically a block in a blockchain is made up of various transactions. The idea is that we
+                  take all of the "pending" transactions, and add them to a new block. That new block will contain
+                  the hashes and data from all of the pending transactions that you can view later.
+                  </p>
+                  <br>
+                  <p>
+                    Since this toy blockchain uses a "Proof of Work" algorithm, for us to create a new block we need to 
+                    solve a fairly easy math problem. In this case we want to find a hash that starts with four zeros.
+                    This process is usually called mining. Once a block has been mined, all of the pending transactions
+                    are added to it, a hash is created for the block and it is then added to the blockchain. The hash
+                    that is created for the new block is based off of the transactions that are associated with it. If
+                    One of those transactions change later on then the entire block is invalidated, which in turn breaks
+                    the entire blockchain.
+                  </p>
+                  <br><br>
+                  </div>
+              </div>
+              <div class="col-sm-12 col-sm-last col-md-12 col-md-normal">
 		    <table class="striped" id="translist">
 			<thead>
 			    <tr>
@@ -43,7 +65,7 @@
 	    <div class="row">
 		<div class="col-sm-4 col-sm-offset-4">
 		    <center>
-			<input type="button" class="primary" onclick="mineTransaction()" value="Mine!">
+			<input id="minebutton" type="button" class="primary" onclick="mineTransaction()" value="Mine!">
 		    </center>
 		</div>
 	    </div>
@@ -85,7 +107,8 @@ function mineTransaction() {
 	type: "GET",
 	url: "http://localhost:8000/mine",
 	success: function(data) {
-	    $("#message").html("Success!");
+	    $("#message").html("New Block Created");
+            $("#minebutton").hide();
 	    loadTransactions();
 	},
 	error: function(err) {

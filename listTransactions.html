@@ -1,57 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Transaction List</title>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-default.min.css">
-	<link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-nord.min.css">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Transaction List</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-default.min.css">
+        <link rel="stylesheet" href="https://gitcdn.link/repo/Chalarangelo/mini.css/master/dist/mini-nord.min.css">
     </head>
     <body>
-	<header>
-	    <a href="#" class="logo">Blockhead</a>
-	    <a href="index.html" role="button">About</a>
-	    <span>|</span>
-	    <a href="newTransaction.html" role="button">New Transaction</a>
-	    <span>-></span>
-	    <a href="mine.html" role="button">Mine Blocks</a>
-	    <span>-></span>
-	    <a href="list.html" role="button">List Blocks</a>
-	</header>
-	<div class="container"style="padding-top: 4em;">
-	    <div class="row">
-		<div class="cols-sm-10">
-		    <table class="striped" id="blocklist">
-			<thead>
-			    <tr>
-				<th>From</th>
-				<th>To</th>
-				<th>Amount</th>
-				<th></th>
-			    </tr>
-			</thead>
-			<tbody id="blockbody">
-			</tbody>
-		    </table>
-		</div>
-	    </div>
-	</div>
+        <header>
+            <a href="#" class="logo">Blockhead</a>
+            <a href="index.html" role="button">About</a>
+            <span>|</span>
+            <a href="newTransaction.html" role="button">New Transaction</a>
+            <span>-></span>
+            <a href="mine.html" role="button">Mine Blocks</a>
+            <span>-></span>
+            <a href="list.html" role="button">List Blocks</a>
+        </header>
+        <div class="container"style="padding-top: 4em;">
+            <div class="row">
+                <div class="col-sm-10 col-sm-last col-sm-offset-1 col-md-10 col-md-normal">
+                <p>
+                    The whole idea behind a blockchain is that the data is immutable. Each new block depends on the hash of
+                    the previous block, so if the previous block's hash changes, the whole chain should become invalid.
+                    <br>
+                    To demonstrate this, edit one of the transactions below and save it. Once you've saved it you should
+                    be able to go back to the <a href="list.html">block list</a> page and see that the hash for this block
+                    changed.
+                    <br>
+                    Assuming that you have a blocks after this one you will see that their previous hash value is now red.
+                    This indicates that chain is now invalid because the previous hash doesn't match what the block has.
+                </p>
+                <br><br>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 col-sm-last col-md-12 col-md-normal">
+                    <table class="striped" id="blocklist">
+                        <thead>
+                            <tr>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Amount</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="blockbody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-10 col-sm-last col-sm-offset-1 col-md-10 col-md-normal">
+                    <br>
+                    <center>
+                <p id="message"></p>
+                    </center>
+                </div>
+            </div>
+        </div>
     </body>
 
     <script type="text/javascript">
-	function getQuery() {
-	    var data = {};
+        function getQuery() {
+            var data = {};
 
-	    location.search.substr(1).split('&').forEach(function (q) {
-		var s = q.split('='),
-		    k = s[0],
-		    v = s[1] && decodeURIComponent(s[1]);
+            location.search.substr(1).split('&').forEach(function (q) {
+                var s = q.split('='),
+                    k = s[0],
+                    v = s[1] && decodeURIComponent(s[1]);
 
-		if (k) data[k] = [v];
-	    });
-	    return data['index'].toString();
-	}
+                if (k) data[k] = [v];
+            });
+            return data['index'].toString();
+        }
 
 function updateTransaction(transid) {
     console.log("updating id: " + transid);
@@ -62,47 +86,47 @@ function updateTransaction(transid) {
     var amount=$("#amount-" + transid).val();
     console.log(amount);
     $.ajax({
-	type: "POST",
-	url: "http://localhost:8000/editTransaction",
-	data: {blockindex:getQuery(), id:transid, to:to,from:from,amount:amount},
-	success: function(data) {
-	    $("#message").html("Success!");
-$('#blockbody').empty();
-	    listTransactions();
-	},
-	error: function(err) {
-	    alert(err);
-	}
+        type: "POST",
+        url: "http://localhost:8000/editTransaction",
+        data: {blockindex:getQuery(), id:transid, to:to,from:from,amount:amount},
+        success: function(data) {
+            $("#message").html("Now go back to the <a href=\"list.html\">block list</a>. The block hash should have changed and invalidated the chain.");
+            $('#blockbody').empty();
+            listTransactions();
+        },
+        error: function(err) {
+            alert(err);
+        }
     });
 
 }
 
 function listTransactions() {
     $.ajax({
-	url: "http://localhost:8000/getBlockTransactions?index=" + getQuery(),
-	type: "GET",
-	dataType:"json",
-	success: function (response)
-	{
-	    var trHTML = '';
-	    $.each(response, function (key,value) {
-		trHTML +=
-		    '<tr><td><input type="text" id="from-'+ value.id + '" value="' + value.sender + '">' +
-		    '</td><td><input type="text" id="to-'+ value.id + '" value="' + value.recipient + '">' +
-		    '</td><td><input type="text" id="amount-'+ value.id + '" value="' + value.amount + '">' +
-		    '</td><td><input type="button" class="secondary" onclick="updateTransaction(\'' + value.id + '\')" value="Save">' +
-			'</td></tr>';
-		    });
+        url: "http://localhost:8000/getBlockTransactions?index=" + getQuery(),
+        type: "GET",
+        dataType:"json",
+        success: function (response)
+        {
+            var trHTML = '';
+            $.each(response, function (key,value) {
+                trHTML +=
+                    '<tr><td><input type="text" id="from-'+ value.id + '" value="' + value.sender + '">' +
+                    '</td><td><input type="text" id="to-'+ value.id + '" value="' + value.recipient + '">' +
+                    '</td><td><input type="text" id="amount-'+ value.id + '" value="' + value.amount + '">' +
+                    '</td><td><input type="button" class="secondary" onclick="updateTransaction(\'' + value.id + '\')" value="Save">' +
+                    '</td></tr>';
+            });
 
-		$('#blockbody').append(trHTML);
-	    }
+            $('#blockbody').append(trHTML);
+        }
     });
 }
 
 
 $(document).ready(function()
     {
-	listTransactions();
+        listTransactions();
     });
 
     </script>
