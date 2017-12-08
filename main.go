@@ -18,7 +18,7 @@ func main() {
 	}
 	myChain.AddBlock(genBlock)
 	log.Println("genesis block created, have fun!")
-	http.Handle("/", http.FileServer(http.Dir(".")))
+	http.Handle("/", http.FileServer(assetFS()))
 	http.Handle("/list", blockListHandler(&myChain))
 	http.Handle("/mine", mineHandler(&myChain))
 	http.Handle("/newTransaction", newTransactionHandler(&myChain))

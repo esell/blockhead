@@ -7,9 +7,15 @@
   packages = ["."]
   revision = "217f84c78ddaa0ef3c0302ef7a77422b31128f05"
 
+[[projects]]
+  branch = "master"
+  name = "github.com/elazarl/go-bindata-assetfs"
+  packages = ["."]
+  revision = "30f82fa23fd844bd5bb1e5f216db87fd77b5eb43"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3c84858eef0175970622a732cd07865a8717267abb02802dffb4aff324f9dea1"
+  inputs-digest = "ba71d2abcbef22f439f6854834a32f5d70364d73193e0452e97da3c669636c81"
   solver-name = "gps-cdcl"
   solver-version = 1
