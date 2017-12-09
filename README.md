@@ -14,10 +14,13 @@ since evolved into (hopefully) a learning tool.
 
 
 # Typical process
+## From Source
 
 * `go get git.esheavyindustries.com/esell/blockhead`
 * `$GOPATH/bin/blockhead`
 * Open up a browser and navigate to `http://localhost:8000/`. From there just follow the arrows in the top menu
 
 
-
+## From Releases
+* Download latest release from the "releases" page and run it
+* Open up a browser and navigate to `http://localhost:8000/`. From there just follow the arrows in the top menu
